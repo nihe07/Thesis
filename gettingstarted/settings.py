@@ -27,14 +27,6 @@ SECRET_KEY = "CHANGE_ME!!!! (P.S. the SECRET_KEY environment variable will be us
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
-# # AWS 
-# AWS_ACCESS_KEY_ID = 'AKIAJ3AJZ6VIMQNFMTKQ'
-# AWS_SECRET_ACCESS_KEY = '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'
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# AWS_STORAGE_BUCKET_NAME = 'ninathesis-uploads'
-# AWS_S3_REGION_NAME = 'us-east-2'
-
 ALLOWED_HOSTS = []
 
 
