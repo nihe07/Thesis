@@ -1,0 +1,1747 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- -------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------- -->
+<!-- SCRIPT FOR MAIN FUNCTIONS + AJAX CALLS TO PYTHON -->
+<!-- -------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------- -->
+
+<script>
+    function rgb2hex(rgb) {
+        function hex(x) {
+            return ("0" + parseInt(x).toString(16)).slice(-2);
+        }
+        return "#" + hex(rgb[0]) + hex(rgb[1]) + hex(rgb[2]);
+    }
+
+
+	function return_palinim(img, pal, callback){
+        $.ajax({
+          type: "GET",
+          url: "/return_palinim/",  
+          data: { 
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            imgsrc: img, 
+            palette: pal},
+          success: callback,
+          complete: function(data){}
+        });
+    } 
+
+    function get_palinim(img, pal){
+        return_palinim(img, pal, function(response) {
+        	var palinimret = response[0];
+        	document.getElementById("palinim-try").src = palinimret;
+        });
+    }
+
+    function return_hue(img, val, callback){
+        $.ajax({
+          type: "GET",
+          url: "/return_hue/",  
+          data: { 
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            imgsrc: img, 
+            val: val},
+          success: callback,
+          complete: function(data){}
+        });
+    } 
+
+    function get_hue(img, val){
+        return_hue(img, val, function(response) {
+        	var hueret = response[0];
+        	document.getElementById("hue-try").src = hueret;
+        });
+    }
+
+    function return_pix(img, val, callback){
+        $.ajax({
+          type: "GET",
+          url: "/return_pix/",  
+          data: { 
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            imgsrc: img, 
+            val: val},
+          success: callback,
+          complete: function(data){}
+        });
+    } 
+
+    function get_pix(img, val){
+        return_pix(img, val, function(response) {
+        	var pixret = response[0];
+        	document.getElementById("pix-try").src = pixret;
+        });
+    }
+
+
+
+    function returnMET(img, callback){
+        $.ajax({
+          type: "GET",
+          url: "/returnMET/",  
+          data: { 
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            imsrc: img},
+          success: callback,
+          complete: function(data){}
+        });
+    } 
+
+    function getMET(imgsrc){
+        returnMET(imgsrc, function(response) {
+            console.log(response[0]);
+        });
+    }
+
+    function returnMETvals(callback){
+        $.ajax({
+          type: "GET",
+          url: "/returnMETvals/",  
+          data: { 
+            csrfmiddlewaretoken: '{{ csrf_token }}'},
+          success: callback,
+          complete: function(data){}
+        });
+    }
+
+    function getMETvals(){
+        returnMETvals(function(response) {
+            var METdone = response[0];
+            var imurls = response[1];
+            var imcols = response[2];
+            var c1_imurls = response[3];
+            var c1_imcols = response[4];
+            var c2_imurls = response[5];
+            var c2_imcols = response[6];
+            var c3_imurls = response[7];
+            var c3_imcols = response[8];
+            var c4_imurls = response[9];
+            var c4_imcols = response[10];
+
+
+            if(METdone == false) {
+                console.log('heyyyy gurrllll');
+                setTimeout(function(){getMETvals();}, 10000);
+            }
+
+            if(METdone == true) {
+                console.log('BYE BISH');
+				let urlsarr = [imurls, c1_imurls, c2_imurls, c3_imurls, c4_imurls];
+				let colsarr = [imcols, c1_imcols, c2_imcols, c3_imcols, c4_imcols];
+
+				// for each category
+				for (let k = 0; k < 7; k++){
+					let urls = urlsarr[k];
+					let imcols = colsarr[k];
+					let id = k+1
+
+					let containerstr = "palIms" + id;
+					document.getElementById(containerstr).innerHTML= ""
+					let container = document.getElementById(containerstr);
+
+					// for all the images in each category
+					for (let i = 0; i < 30; i++) {
+						let cols = imcols[i];
+				        var img = document.createElement('img');
+
+
+				        img.src = urls[i];
+				        img.className= "display-im";
+
+				        // let objectURL = "http://www.metmuseum.org/art/collection/search/38";
+				        
+				        // var link = document.createElement('a');
+				        // link.setAttribute("href", objectURL);
+	           //          link.setAttribute("target", "_blank");
+	           //          link.appendChild(img)
+
+
+				        var elem = document.createElement('div');
+				        elem.setAttribute("class", "im-and-pal");
+				        var pal = document.createElement('div');
+				        pal.setAttribute("class", "palette");
+
+				        for (let j = 0; j < 5; j++) {
+				            let col = document.createElement('div');
+				            col.setAttribute("class", "pal-color");
+				            let hex = 'rgb(' + cols[j][0]+ ',' + cols[j][1] + ',' + cols[j][2] + ')';
+				            col.style.cssText = 'background-color:' + hex + ';'
+				            pal.appendChild(col)
+				        }
+				        elem.append(img);
+				        // elem.append(link);
+				        elem.append(pal);
+				        container.appendChild(elem)
+				    }
+				}
+
+
+
+
+
+
+
+                document.getElementById('palIms').innerHTML= ""
+                var container = document.getElementById('palIms');
+
+                for (let i = 0; i < 10; i++) {
+                    var img = document.createElement('img');
+                    img.src = imurls[i];
+                    img.className= "display-im"
+
+                    cols = imcols[i]
+                    var elem = document.createElement('div');
+                    elem.setAttribute("class", "im-and-pal");
+
+                    var pal = document.createElement('div');
+                    pal.setAttribute("class", "palette");
+
+                    for (let j = 0; j <5; j++) {
+                        let col = document.createElement('div');
+                        col.setAttribute("class", "pal-color");
+                        let hex = 'rgb(' + cols[j][0]+ ',' + cols[j][1] + ',' + cols[j][2] + ')';
+                        col.style.cssText = 'background-color:' + hex + ';'
+                        pal.appendChild(col)
+                    }
+                    
+                    elem.append(img);
+                    elem.append(pal);
+                    container.appendChild(elem)
+                }
+            } 
+        });    
+    }
+
+
+    function returnAll(img, callback){
+        console.log('calling returnAll')
+        $.ajax({
+          type: "GET",
+          url: "/returnAll/",  
+          data: { 
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            imsrc: img},
+          success: callback,
+          complete: function(data){}
+        });
+    } 
+
+    function getAll(imgsrc){
+	    returnAll(imgsrc, function(response) {
+	    	var palette = response[0];
+
+	    	var lowsat = response[1];
+	    	var highsat = response[2];
+	    	var valu = response[3];
+	    	var compl1 = response[4];
+	    	var compl2 = response[5];
+	    	var compl3 = response[6];
+            var compl4 = response[7];
+            var compl5 = response[8];
+            var invpal = response[9];
+            var bwpal = response[10];           
+
+            var piiA = response[11];
+            var piiB = response[12];
+            var piiC = response[13];
+            var piiD = response[14];
+            var piiE = response[15];
+            var piiF = response[16];
+            var piiG = response[17];
+            var piiH = response[18];
+            var piiI = response[19];
+            var piiJ = response[20];
+            var piiK = response[21];
+            var piiL = response[22];
+
+            var switch1 = response[23];
+            var switch2 = response[24];
+            var switch3 = response[25];
+            var hue1 = response[26];
+            var hue2 = response[27];
+            var hue3 = response[28];
+            var palinim1 = response[29];
+            var palinim2 = response[30];
+            var palinim3 = response[31];
+            var binim = response[32];
+            var binim2 = response[33];
+	    	var edge = response[34];
+            var pix1 = response[35];
+            var pix2 = response[36];
+            var pix3 = response[37];
+	    	var invertim = response[38];
+		    var sepia = response[39];
+		    var bw = response[40];
+
+            var labels = response[41];
+            var googleimpal = response[42];
+
+
+            document.getElementById('uploadContent').style.display = "none";
+            document.getElementById('loadedContent').style.display = "block";
+            document.getElementById("labels").innerHTML = labels;
+            document.getElementById('imupload').src = imgsrc;
+
+            fillPalette(palette, 'a');
+            fillPalette(lowsat, 'b');
+            fillPalette(highsat, 'c');
+            fillPalette(valu, 'd');
+            fillPalette(compl1, 'e');
+            fillPalette(compl2, 'f');
+            fillPalette(compl3, 'g');
+            fillPalette(compl4, 'h');
+            fillPalette(compl5, 'i');
+            fillPalette(bwpal, 'j');
+            fillPalette(invpal, 'k');
+            fillPalette(googleimpal, 'l');
+
+
+            fillPalette(palette, 'met');
+
+            document.getElementById("piiA").src = piiA
+            document.getElementById("piiB").src = piiB
+            document.getElementById("piiC").src = piiC
+            document.getElementById("piiD").src = piiD
+            document.getElementById("piiE").src = piiE
+            document.getElementById("piiF").src = piiF
+            document.getElementById("piiG").src = piiG
+            document.getElementById("piiH").src = piiH
+            document.getElementById("piiI").src = piiI
+            document.getElementById("piiJ").src = piiJ
+            document.getElementById("piiK").src = piiK
+            document.getElementById("piiL").src = piiL
+
+
+            document.getElementById("switch1").src = switch1
+            document.getElementById("switch2").src = switch2 
+            document.getElementById("switch3").src = switch3
+            document.getElementById("hue1").src = hue1
+            document.getElementById("hue2").src = hue2
+            document.getElementById("hue3").src = hue3
+            document.getElementById("palinim1").src = palinim1
+            document.getElementById("palinim2").src = palinim2
+            document.getElementById("palinim3").src = palinim3
+            document.getElementById("binim").src = binim
+            document.getElementById("binim2").src = binim2
+            document.getElementById("edge").src = edge
+            document.getElementById("pix1").src = pix1
+            document.getElementById("pix2").src = pix2
+            document.getElementById("pix3").src = pix3
+            document.getElementById("invertim").src = invertim
+            document.getElementById("sepia").src = sepia
+            document.getElementById("bw").src = bw
+
+
+            document.getElementById("palinim-try").src = palinim2
+            document.getElementById("hue-try").src = hue1
+            document.getElementById("pix-try").src = pix1
+
+
+            $("#loader").hide();
+
+	    });
+    }
+
+    function fillPalette(palette, id) {
+    	var hex1 = 'rgb(' + palette[0][0]+ ',' + palette[0][1] + ',' + palette[0][2] + ')';
+    	var hex2 = 'rgb(' + palette[1][0]+ ',' + palette[1][1] + ',' + palette[1][2] + ')';
+    	var hex3 = 'rgb(' + palette[2][0]+ ',' + palette[2][1] + ',' + palette[2][2] + ')';
+    	var hex4 = 'rgb(' + palette[3][0]+ ',' + palette[3][1] + ',' + palette[3][2] + ')';
+    	var hex5 = 'rgb(' + palette[4][0]+ ',' + palette[4][1] + ',' + palette[4][2] + ')';
+    	
+    	var hextex1 = rgb2hex(palette[0]);
+    	var hextex2 = rgb2hex(palette[1]);
+    	var hextex3 = rgb2hex(palette[2]);
+    	var hextex4 = rgb2hex(palette[3]);
+    	var hextex5 = rgb2hex(palette[4]);
+
+    	var col1 = document.getElementById(id + '1');
+    	var col2 = document.getElementById(id + '2');
+    	var col3 = document.getElementById(id + '3');
+    	var col4 = document.getElementById(id + '4');
+    	var col5 = document.getElementById(id + '5');
+
+    	col1.style.backgroundColor = hex1;
+    	col2.style.backgroundColor = hex2;
+    	col3.style.backgroundColor = hex3;
+    	col4.style.backgroundColor = hex4;
+    	col5.style.backgroundColor = hex5;
+
+    	if (id != "met"){
+    		var col10 = document.getElementById(id + id + '1');
+	    	var col20 = document.getElementById(id + id + '2');
+	    	var col30 = document.getElementById(id + id + '3');
+	    	var col40 = document.getElementById(id + id + '4');
+	    	var col50 = document.getElementById(id + id + '5');
+
+	    	var tex1 = document.getElementById(id +"-hex1");
+	    	var tex2 = document.getElementById(id +"-hex2");
+	    	var tex3 = document.getElementById(id +"-hex3");
+	    	var tex4 = document.getElementById(id +"-hex4");
+	    	var tex5 = document.getElementById(id +"-hex5");
+
+		    col10.style.backgroundColor = hex1;
+	    	col20.style.backgroundColor = hex2;
+	    	col30.style.backgroundColor = hex3;
+	    	col40.style.backgroundColor = hex4;
+	    	col50.style.backgroundColor = hex5;
+
+	    	tex1.innerHTML = hextex1;
+	    	tex2.innerHTML = hextex2;
+	    	tex3.innerHTML = hextex3;
+	    	tex4.innerHTML = hextex4;
+	    	tex5.innerHTML = hextex5;
+
+    	}
+    }
+
+
+    function uploadscreen(){
+        document.getElementById('uploadContent').style.display = "block";
+        document.getElementById('loadedContent').style.display = "none";
+
+    }
+
+    function showExpand(id){
+		var x = document.getElementById(id);
+		if (x.style.display === "none") {x.style.display = "flex";} 
+		else {x.style.display = "none";}
+	}
+
+
+	function changeHeader(id) {
+		var title = document.getElementById('headertit');
+		var blurb = document.getElementById('blurb');
+		if (id == 1) {
+			currID = 1;
+			title.innerHTML = "Color Palettes"
+			blurb.innerHTML = "Explore your image's colors and various related related. Click on a palette to view more information, individual hex codes, and your image expressed in the palette's colors.";
+		}
+		else if (id == 2) {
+			currID = 2;
+			title.innerHTML = "Image Filters"
+			blurb.innerHTML = "Click on an image to view more details and play with interactive tools where applicable.";
+		}
+		else {
+			currID = 3;
+			title.innerHTML = "MET Palettes";
+			blurb.innerHTML = "Look through artworks from the Metropolitan Museum of Art that have similar palettes to your own image, and filter the artworks by medium.";
+		}
+	}
+
+
+
+
+
+    function showPicker(id, event) {
+		  var x = document.getElementById(id);
+		  if (x.style.display === "none") {
+		    x.style.display = "block";
+		  }
+		  else {x.style.display = "none"}
+		  	event.stopPropagation();
+		}
+
+	function keepPicker(id, event) {
+		var x = document.getElementById(id);
+		x.style.display = "block";
+		event.stopPropagation();
+
+	}
+
+	function hidePicker(id) {
+	  var x = document.getElementById(id);
+	  x.style.display = "none";
+
+	}
+
+	function showfiltered(id){
+		let ims1 = 'palIms' + id; 
+		let butt1 = 'filter' + id; 
+
+		document.getElementById(ims1).style.display = "flex"
+		document.getElementById(butt1).style.backgroundColor = "#446DFC"
+		document.getElementById(butt1).style.color = "white"
+
+
+		for (let i = 1; i <= 7; i++){
+			if (i != id){
+				let ims = 'palIms' + i;
+				let butt = 'filter' + i;
+				document.getElementById(ims).style.display = "none"
+				document.getElementById(butt).style.backgroundColor = "#d9d9d9"
+				document.getElementById(butt).style.color = "black"
+			}
+		}
+    }
+
+    var pagenum = 1;
+
+    function arrowstest(num){
+    	if (num == 1){
+    		pagenum += 1;
+    		if (pagenum > 3) {
+    			pagenum = 1;
+    		}
+    	}
+    	else if (num == -1){
+    		pagenum -= 1;
+    		if (pagenum < 1) {
+    			pagenum = 3;
+    		}
+    	}
+    	changeHeader(pagenum);
+    }
+	
+</script>
+
+
+
+
+
+
+
+<!-- -------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------- -->
+<!-- UPLOAD SCREEN -->
+<!-- -------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------- -->
+
+<div id = "uploadContent">
+    <img src = "{% static 'splashscreenpal.png'%}" style="position:absolute; height: 100%; left: 0; top:0; padding: 16px;">
+    <img src = "{% static 'splashscreenpal.png'%}" style="position:absolute; height: 100%; right: 0; top:0; padding: 16px;">
+
+    <div id = "centered" class = "center">
+        <div class="title" style = "text-align: center">ColorDive</div>
+        <div class ="title-subtext" style = "text-align: center">Upload an image and dive into its colors! Explore color palettes, interactive filters, and other artworks with similar color compositions. </div>
+        <br></br>
+
+        <div class = "loader" id="loader" style="display: none;"></div>
+
+        <div class= "input" id = "input">
+            <form method="post" enctype="multipart/form-data" onsubmit="showloader()">
+              {% csrf_token %}
+
+              <label class = "hide-choosefile" id="upfile">{{form.image}}</label>
+
+              <div class = "intro-buttons">
+              	<button class ="choosefile" type="button" onclick="getfile()">Choose file</button>
+              	<div class="filename" id="file-selected">No file chosen</div>
+              </div>
+              
+              <div>
+              	<button class="submit" type="submit" id="submit">Upload</button>
+              </div>
+            </form>
+        </div>
+
+
+        <script>
+        	function getfile() { document.getElementById("upfile").click();}
+
+			var input  = document.getElementById('upload-im');
+			input.addEventListener('change', function() { document.getElementById('file-selected').innerHTML = this.files[0].name;});
+
+            function showloader(){
+                $("#input").hide();
+                $("#loader").show();
+            }
+        </script>
+
+
+        {% if img_obj %}
+          <br></br>
+          <script>
+            $("#loader").show();
+            $("#input").hide();
+            getAll('{{ img_obj.image.url}}')
+            getMET('{{ img_obj.image.url}}')
+            getMETvals()
+          </script>
+        {% endif %}
+
+        
+    </div>
+</div>
+
+<!-- -------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------- -->
+<!-- LOADED CONTENT SCREEN -->
+<!-- -------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------- -->
+<div id="loadedContent" style="display:none">
+	<div class = "myrow pagetitle" style="padding-bottom: 48px">ColorDive</div>
+	<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="false">
+		<div class = "myrow">
+	      	<div class = "mycolumn" style="flex:46%; text-align: center;">
+	      		<img class ="main-im" src="{{ img_obj.image.url}}"   id="imupload">
+	      	</div>
+	      	<div class = "mycolumn" style="flex:3%; max-height: 60vh;"></div>
+	      	<div class = "mycolumn" style="flex:41%; max-height: 60vh; text-align: left;">
+	      		<ol class="carousel-indicators">
+				    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active" onclick="changeHeader(1)"></li>
+				    <li data-target="#carouselExampleIndicators" data-slide-to="1" onclick="changeHeader(2)"></li>
+				    <li data-target="#carouselExampleIndicators" data-slide-to="2" onclick="changeHeader(3)"></li>
+				</ol>
+	      		<div class="header" id = "headertit"> Color Palettes</div>
+	      		<div class="blurb" id ="blurb">Explore your image's colors and various related related. Click on a palette to view more information, individual hex codes, and your image expressed in the palette's colors.</div>
+	      	</div>
+	    </div>
+	  
+
+	<!-- -------------------------------------------------------------- -->
+	<!-- MAIN SCREEN CAROUSEL -->
+	<!-- -------------------------------------------------------------- -->
+	<div class="carousel-inner">
+
+
+		<!-- -------------------------------------------------------------- -->
+		<!-- PALETTES -->
+		<!-- -------------------------------------------------------------- -->
+	    <div class="carousel-item active" id="header1">
+	      <div class = "content-center" alt="First slide">
+
+
+			<!-- -------------------------------------------------------------- -->
+			<!-- main palette -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('a-ex')">
+		        <div class = "palcol" id ="a1"></div>
+		        <div class = "palcol" id ="a2"></div>
+		        <div class = "palcol" id ="a3"></div>
+		        <div class = "palcol" id ="a4"></div>
+		        <div class = "palcol" id ="a5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="a-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" style="width:100%" id = "piiA"  >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Image Palette</div>
+		    		<div class = "exp-subtext">Colors  found in the original image, calculated using a K-means clustering algorithm</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="aa1"></div>
+				        <div class = "exp-palcol" id ="aa2"></div>
+				        <div class = "exp-palcol" id ="aa3"></div>
+				        <div class = "exp-palcol" id ="aa4"></div>
+				        <div class = "exp-palcol" id ="aa5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="a-hex1"></div>
+				        <div class = "exp-palcol-text" id ="a-hex2"></div>
+				        <div class = "exp-palcol-text" id ="a-hex3"></div>
+				        <div class = "exp-palcol-text" id ="a-hex4"></div>
+				        <div class = "exp-palcol-text" id ="a-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('a-ex')">
+		    	</div>
+		    </div>
+
+			
+			<!-- -------------------------------------------------------------- -->
+			<!-- low saturation -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('b-ex')">
+		        <div class = "palcol" id ="b1"></div>
+		        <div class = "palcol" id ="b2"></div>
+		        <div class = "palcol" id ="b3"></div>
+		        <div class = "palcol" id ="b4"></div>
+		        <div class = "palcol" id ="b5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="b-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" style="width:100%"  id = "piiB"  >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Low Saturation</div>
+		    		<div class = "exp-subtext">Colors with lower saturation; saturation describes the intensity or vibrancy of the hues</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="bb1"></div>
+				        <div class = "exp-palcol" id ="bb2"></div>
+				        <div class = "exp-palcol" id ="bb3"></div>
+				        <div class = "exp-palcol" id ="bb4"></div>
+				        <div class = "exp-palcol" id ="bb5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="b-hex1"></div>
+				        <div class = "exp-palcol-text" id ="b-hex2"></div>
+				        <div class = "exp-palcol-text" id ="b-hex3"></div>
+				        <div class = "exp-palcol-text" id ="b-hex4"></div>
+				        <div class = "exp-palcol-text" id ="b-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('b-ex')">
+		    	</div>
+		    </div>
+
+
+			<!-- -------------------------------------------------------------- -->
+			<!-- high saturation -->
+			<!-- -------------------------------------------------------------- -->
+			    <div class = "largepalette" onclick="showExpand('c-ex')">
+		        <div class = "palcol" id ="c1"></div>
+		        <div class = "palcol" id ="c2"></div>
+		        <div class = "palcol" id ="c3"></div>
+		        <div class = "palcol" id ="c4"></div>
+		        <div class = "palcol" id ="c5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="c-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiC"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">High Saturation</div>
+		    		<div class = "exp-subtext">Colors with higher saturation; saturation describes the intensity or vibrancy of the hues</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="cc1"></div>
+				        <div class = "exp-palcol" id ="cc2"></div>
+				        <div class = "exp-palcol" id ="cc3"></div>
+				        <div class = "exp-palcol" id ="cc4"></div>
+				        <div class = "exp-palcol" id ="cc5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="c-hex1"></div>
+				        <div class = "exp-palcol-text" id ="c-hex2"></div>
+				        <div class = "exp-palcol-text" id ="c-hex3"></div>
+				        <div class = "exp-palcol-text" id ="c-hex4"></div>
+				        <div class = "exp-palcol-text" id ="c-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('c-ex')">
+		    	</div>
+		    </div>
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- value change -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('d-ex')">
+		        <div class = "palcol" id ="d1"></div>
+		        <div class = "palcol" id ="d2"></div>
+		        <div class = "palcol" id ="d3"></div>
+		        <div class = "palcol" id ="d4"></div>
+		        <div class = "palcol" id ="d5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="d-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiD"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Value </div>
+		    		<div class = "exp-subtext">Colors with higher values; value describes the lightness or darkness of a color
+		    		</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="dd1"></div>
+				        <div class = "exp-palcol" id ="dd2"></div>
+				        <div class = "exp-palcol" id ="dd3"></div>
+				        <div class = "exp-palcol" id ="dd4"></div>
+				        <div class = "exp-palcol" id ="dd5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="d-hex1"></div>
+				        <div class = "exp-palcol-text" id ="d-hex2"></div>
+				        <div class = "exp-palcol-text" id ="d-hex3"></div>
+				        <div class = "exp-palcol-text" id ="d-hex4"></div>
+				        <div class = "exp-palcol-text" id ="d-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('d-ex')">
+		    	</div>
+		    </div>
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- complementary 1 -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('e-ex')">
+		        <div class = "palcol" id ="e1"></div>
+		        <div class = "palcol" id ="e2"></div>
+		        <div class = "palcol" id ="e3"></div>
+		        <div class = "palcol" id ="e4"></div>
+		        <div class = "palcol" id ="e5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="e-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiE"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Complementary 1</div>
+		    		<div class = "exp-subtext">Colors with hues rotated 36 degrees from the original palette colors</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="ee1"></div>
+				        <div class = "exp-palcol" id ="ee2"></div>
+				        <div class = "exp-palcol" id ="ee3"></div>
+				        <div class = "exp-palcol" id ="ee4"></div>
+				        <div class = "exp-palcol" id ="ee5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="e-hex1"></div>
+				        <div class = "exp-palcol-text" id ="e-hex2"></div>
+				        <div class = "exp-palcol-text" id ="e-hex3"></div>
+				        <div class = "exp-palcol-text" id ="e-hex4"></div>
+				        <div class = "exp-palcol-text" id ="e-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('e-ex')">
+		    	</div>
+		    </div>
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- complementary 2 -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('f-ex')">
+		        <div class = "palcol" id ="f1"></div>
+		        <div class = "palcol" id ="f2"></div>
+		        <div class = "palcol" id ="f3"></div>
+		        <div class = "palcol" id ="f4"></div>
+		        <div class = "palcol" id ="f5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="f-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiF"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Complementary 2</div>
+		    		<div class = "exp-subtext">Colors with hues rotated 72 degrees from the original palette colors</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="ff1"></div>
+				        <div class = "exp-palcol" id ="ff2"></div>
+				        <div class = "exp-palcol" id ="ff3"></div>
+				        <div class = "exp-palcol" id ="ff4"></div>
+				        <div class = "exp-palcol" id ="ff5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="f-hex1"></div>
+				        <div class = "exp-palcol-text" id ="f-hex2"></div>
+				        <div class = "exp-palcol-text" id ="f-hex3"></div>
+				        <div class = "exp-palcol-text" id ="f-hex4"></div>
+				        <div class = "exp-palcol-text" id ="f-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('f-ex')">
+		    	</div>
+		    </div>
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- complementary 3 -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('g-ex')">
+		        <div class = "palcol" id ="g1"></div>
+		        <div class = "palcol" id ="g2"></div>
+		        <div class = "palcol" id ="g3"></div>
+		        <div class = "palcol" id ="g4"></div>
+		        <div class = "palcol" id ="g5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="g-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiG"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Complementary 3</div>
+		    		<div class = "exp-subtext">Colors with hues rotated 108 degrees from the original palette colors</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="gg1"></div>
+				        <div class = "exp-palcol" id ="gg2"></div>
+				        <div class = "exp-palcol" id ="gg3"></div>
+				        <div class = "exp-palcol" id ="gg4"></div>
+				        <div class = "exp-palcol" id ="gg5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="g-hex1"></div>
+				        <div class = "exp-palcol-text" id ="g-hex2"></div>
+				        <div class = "exp-palcol-text" id ="g-hex3"></div>
+				        <div class = "exp-palcol-text" id ="g-hex4"></div>
+				        <div class = "exp-palcol-text" id ="g-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('g-ex')">
+		    	</div>
+		    </div>
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- complementary 4 -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('h-ex')">
+		        <div class = "palcol" id ="h1"></div>
+		        <div class = "palcol" id ="h2"></div>
+		        <div class = "palcol" id ="h3"></div>
+		        <div class = "palcol" id ="h4"></div>
+		        <div class = "palcol" id ="h5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="h-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiH"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Complementary 4</div>
+		    		<div class = "exp-subtext">Colors with hues rotated 144 degrees from the original palette colors</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="hh1"></div>
+				        <div class = "exp-palcol" id ="hh2"></div>
+				        <div class = "exp-palcol" id ="hh3"></div>
+				        <div class = "exp-palcol" id ="hh4"></div>
+				        <div class = "exp-palcol" id ="hh5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="h-hex1"></div>
+				        <div class = "exp-palcol-text" id ="h-hex2"></div>
+				        <div class = "exp-palcol-text" id ="h-hex3"></div>
+				        <div class = "exp-palcol-text" id ="h-hex4"></div>
+				        <div class = "exp-palcol-text" id ="h-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('h-ex')">
+		    	</div>
+		    </div>
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- complementary 5 -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('i-ex')">
+		        <div class = "palcol" id ="i1"></div>
+		        <div class = "palcol" id ="i2"></div>
+		        <div class = "palcol" id ="i3"></div>
+		        <div class = "palcol" id ="i4"></div>
+		        <div class = "palcol" id ="i5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="i-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiI"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Complementary 5</div>
+		    		<div class = "exp-subtext">Colors with hues rotated 180 degrees from the original palette colors</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="ii1"></div>
+				        <div class = "exp-palcol" id ="ii2"></div>
+				        <div class = "exp-palcol" id ="ii3"></div>
+				        <div class = "exp-palcol" id ="ii4"></div>
+				        <div class = "exp-palcol" id ="ii5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="i-hex1"></div>
+				        <div class = "exp-palcol-text" id ="i-hex2"></div>
+				        <div class = "exp-palcol-text" id ="i-hex3"></div>
+				        <div class = "exp-palcol-text" id ="i-hex4"></div>
+				        <div class = "exp-palcol-text" id ="i-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('i-ex')">
+		    	</div>
+		    </div>
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- bw -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('j-ex')">
+		        <div class = "palcol" id ="j1"></div>
+		        <div class = "palcol" id ="j2"></div>
+		        <div class = "palcol" id ="j3"></div>
+		        <div class = "palcol" id ="j4"></div>
+		        <div class = "palcol" id ="j5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="j-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiJ"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Black & White</div>
+		    		<div class = "exp-subtext">Greyscale colors</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="jj1"></div>
+				        <div class = "exp-palcol" id ="jj2"></div>
+				        <div class = "exp-palcol" id ="jj3"></div>
+				        <div class = "exp-palcol" id ="jj4"></div>
+				        <div class = "exp-palcol" id ="jj5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="j-hex1"></div>
+				        <div class = "exp-palcol-text" id ="j-hex2"></div>
+				        <div class = "exp-palcol-text" id ="j-hex3"></div>
+				        <div class = "exp-palcol-text" id ="j-hex4"></div>
+				        <div class = "exp-palcol-text" id ="j-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('j-ex')">
+		    	</div>
+		    </div>
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- inverted -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('k-ex')">
+		        <div class = "palcol" id ="k1"></div>
+		        <div class = "palcol" id ="k2"></div>
+		        <div class = "palcol" id ="k3"></div>
+		        <div class = "palcol" id ="k4"></div>
+		        <div class = "palcol" id ="k5"></div>
+		    </div>
+
+		    <div class = "expanded myrow" style="display: none" id="k-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center; ">
+		    		<img src = "" id = "piiK"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Inverted</div>
+		    		<div class = "exp-subtext">Inverted colors, calculated by subtracting colors from White </div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="kk1"></div>
+				        <div class = "exp-palcol" id ="kk2"></div>
+				        <div class = "exp-palcol" id ="kk3"></div>
+				        <div class = "exp-palcol" id ="kk4"></div>
+				        <div class = "exp-palcol" id ="kk5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="k-hex1"></div>
+				        <div class = "exp-palcol-text" id ="k-hex2"></div>
+				        <div class = "exp-palcol-text" id ="k-hex3"></div>
+				        <div class = "exp-palcol-text" id ="k-hex4"></div>
+				        <div class = "exp-palcol-text" id ="k-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('k-ex')">
+		    	</div>
+		    </div>
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- google vision -->
+			<!-- -------------------------------------------------------------- -->
+		    <div class = "largepalette" onclick="showExpand('l-ex')">
+		        <div class = "palcol" id ="l1"></div>
+		        <div class = "palcol" id ="l2"></div>
+		        <div class = "palcol" id ="l3"></div>
+		        <div class = "palcol" id ="l4"></div>
+		        <div class = "palcol" id ="l5"></div>
+		    </div>
+
+		    
+		    <div class = "expanded myrow" style="display: none" id="l-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id = "piiL"   style="width:100%" >	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%;"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align: left;">
+		    		<div class = "exp-header">Google Search</div>
+		    		<div class = "exp-subtext">This palette detects the image content and converts each detected label to a color, using dominant colors from Google image search results</div>
+		    		<div class = "exp-subtext" id = "labels"></div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol" id ="ll1"></div>
+				        <div class = "exp-palcol" id ="ll2"></div>
+				        <div class = "exp-palcol" id ="ll3"></div>
+				        <div class = "exp-palcol" id ="ll4"></div>
+				        <div class = "exp-palcol" id ="ll5"></div>
+			    	</div>
+			    	<div class = "exp-pal">
+				        <div class = "exp-palcol-text" id ="l-hex1"></div>
+				        <div class = "exp-palcol-text" id ="l-hex2"></div>
+				        <div class = "exp-palcol-text" id ="l-hex3"></div>
+				        <div class = "exp-palcol-text" id ="l-hex4"></div>
+				        <div class = "exp-palcol-text" id ="l-hex5"></div>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('l-ex')">
+		    	</div>
+		    </div>
+	      </div>
+	    </div>
+
+
+		<!-- ------------------------------------------------------------------------------- -->
+	    <!-- IMAGE MANIPULATION CAROUSEL -->
+		<!-- ------------------------------------------------------------------------------- -->
+
+	    <div class="carousel-item" id="header2">
+	      <div class = "content-center" alt="Second slide">
+	      	<!-- -------------------------------------------------------------- -->
+			<!-- palette in image -->
+			<!-- -------------------------------------------------------------- -->	      	
+			<div class = "myrow imrow" onclick="showExpand('palinim-ex')">
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "palinim1" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "palinim2" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "palinim3" class = "manip-im">
+	      		</div>
+	      	</div>
+
+	      	<div class = "expanded myrow" style="display: none" id="palinim-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id="palinim-try" style="width:100%">	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align:left;">
+		    		<div class = "exp-header">Palette in image</div>
+		    		<div class = "exp-subtext">Choose a palette and watch the palette's colors get distributed to their closest color in the original image</div>
+			    	<div style="display:flex; padding-left:1vw; padding-bottom:4px">
+						<div class="pal-input-container">
+							<div id = "circle1" class = "pal-input" onclick="showPicker('boxPicker1', event)"></div>
+							<div class="ColorPicker" id="boxPicker1" style="display:none; position: absolute; padding-top: 50px;" onclick = "keepPicker('boxPicker1', event)">
+					        </div>
+						</div>
+
+						<div class="pal-input-container">
+							<div id = "circle2" class = "pal-input" onclick="showPicker('boxPicker2', event)"></div>
+							<div class="ColorPicker" id="boxPicker2" style="display:none; position: absolute; padding-top: 50px;" onclick = "keepPicker('boxPicker2', event)">
+					        </div>
+						</div>
+
+						<div class="pal-input-container">
+							<div id = "circle3" class = "pal-input" onclick="showPicker('boxPicker3', event)"></div>
+							<div class="ColorPicker" id="boxPicker3" style="display:none; position: absolute; padding-top: 50px;" onclick = "keepPicker('boxPicker3', event)">
+					        </div>
+						</div>
+
+						<div class="pal-input-container">
+							<div id = "circle4" class = "pal-input" onclick="showPicker('boxPicker4', event)"></div>
+							<div class="ColorPicker" id="boxPicker4" style="display:none; position: absolute; padding-top: 50px;" onclick = "keepPicker('boxPicker4', event)">
+					        </div>
+						</div>
+
+						<div class="pal-input-container">
+							<div id = "circle5" class = "pal-input" onclick="showPicker('boxPicker5', event)"></div>
+							<div class="ColorPicker" id="boxPicker5" style="display:none; position: absolute; padding-top: 50px;" onclick = "keepPicker('boxPicker5', event)">
+					        </div>
+						</div>
+
+			    	</div>
+
+			    	<div>
+						<input class = "inputbox" id="hexval1"></input>
+						<input class = "inputbox" id="hexval2"></input>
+						<input class = "inputbox" id="hexval3"></input>
+						<input class = "inputbox" id="hexval4"></input>
+						<input class = "inputbox" id="hexval5"></input>
+			    	</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('palinim-ex')">
+		    	</div>
+		    </div>
+
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- hue change -->
+			<!-- -------------------------------------------------------------- -->
+	      	<div class = "myrow imrow" onclick="showExpand('hue-ex')">
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "hue1" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "hue2" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "hue3" class = "manip-im">
+	      		</div>
+	      	</div>
+
+	      	<div class = "expanded myrow" style="display: none" id="hue-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id="hue-try" style="width:100%">	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align:left;">
+		    		<div class = "exp-header">Hue change</div>
+		    		<div class = "exp-subtext">Enter in a hue value between 0 and 360 degrees, and view the image in that hue</div>
+		    		<div class="slidecontainer">
+					  <input type="range" min="0" max="360" value="50" class="slider" id="hueslider">
+					  <input class = "inputbox" id="hueval" value="50" ></input>
+					</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('hue-ex')">
+		    	</div>
+		    </div>
+
+
+	 	 	<!-- -------------------------------------------------------------- -->
+			<!-- pixelated -->
+			<!-- -------------------------------------------------------------- -->
+	      	<div class = "myrow imrow" onclick="showExpand('pix-ex')">
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "pix1" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "pix2" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "pix3" class = "manip-im">
+	      		</div>
+	      	</div>
+
+	      	<div class = "expanded myrow" style="display: none" id="pix-ex">
+		    	<div class = "mycolumn" style="flex: 33%; text-align:center;">
+		    		<img src = "" id="pix-try" style="width:100%">	
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 7%"></div>
+		    	<div class = "mycolumn" style="flex: 60%; text-align:left;">
+		    		<div class = "exp-header">Pixelated</div>
+		    		<div class = "exp-subtext">Change the size of pixelation</div>
+		    		<div class="slidecontainer">
+					  <input type="range" min="1" max="100" value="10" class="slider" id="pixslider">
+					  <input class = "inputbox" id="pixval" value="10" ></input>
+					</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('pix-ex')">
+		    	</div>
+		    </div>
+
+
+	      	<!-- -------------------------------------------------------------- -->
+			<!-- rgb switches -->
+			<!-- -------------------------------------------------------------- -->
+	      	<div class = "myrow imrow" onclick="showExpand('rgb-ex')">
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "switch1" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "switch2"  class = "manip-im"  >
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "switch3"  class = "manip-im"  >
+	      		</div>
+	      	</div>
+
+	      	<div class = "expanded myrow" style="display: none" id="rgb-ex">
+		    	<div class = "mycolumn" style="flex: 98%; text-align: left;">
+		    		<div class = "exp-header">RGB Switches</div>
+		    		<div class = "exp-subtext">These images show the swapping of Red, Green, and Blue color channels; from left to right, the swapped pairings are R/B, B/G, and R/G.</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('rgb-ex')">
+		    	</div>
+		    </div>
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- binary & edge -->
+			<!-- -------------------------------------------------------------- -->
+	      	<div class = "myrow imrow" onclick="showExpand('bin-ex')">
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "binim" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "binim2" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "edge" class = "manip-im">
+	      		</div>
+	      	</div>
+
+	      	<div class = "expanded myrow" style="display: none" id="bin-ex">
+		    	<div class = "mycolumn" style="flex: 98%; text-align: left;">
+		    		<div class = "exp-header">Binary, Inverted conditional, Edge Detection</div>
+		    		<div class = "exp-subtext">The binary image assigns each pixel to black or white, depending on its greyscale value.</div> 
+		    		<div class = "exp-subtext">The inverted conditional filter combines a greyscale image with an inverted image, conditioned on the pixels' greyscale values.</div>
+		    		<div class = "exp-subtext"> The edge detected image implements Canny Edge detection.</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('bin-ex')">
+		    	</div>
+		    </div>
+
+
+
+		    <!-- -------------------------------------------------------------- -->
+			<!-- inverted, sepia, bw -->
+			<!-- -------------------------------------------------------------- -->
+	      	<div class = "myrow imrow" onclick="showExpand('inv-ex')">
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "invertim" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "sepia" class = "manip-im">
+	      		</div>
+	      		<div class = "column" style="flex:33%">
+	      			<img src = "" id = "bw" class = "manip-im">
+	      		</div>
+	      	</div>
+
+	      	<div class = "expanded myrow" style="display: none" id="inv-ex">
+		    	<div class = "mycolumn" style="flex: 98%; text-align: left;">
+		    		<div class = "exp-header">Inverted, Sepia, B&W</div>
+		    		<div class = "exp-subtext">The inverted filter subtracts each pixel's RGB value from White [255,255,255].</div> 
+		    		<div class = "exp-subtext">The sepia filter applies a linear operation on the RGB values, producing a reddish-brown image that simulates monochrome photography from the 19th century.</div>
+		    		<div class = "exp-subtext"> The black and white filter represents the image in greyscale, using Luminance, which is calculated from a weighted average of RGB values.</div>
+		    	</div>
+		    	<div class = "mycolumn" style="flex: 2%;">
+		    		<img src = "{% static 'cancel.png'%}" class="cancel" onclick="showExpand('inv-ex')">
+		    	</div>
+		    </div>
+
+
+	      </div>
+	    </div>
+
+
+
+		<!-- ---------------------------------------------------------------- -->
+	    <!-- MET DATABASE CAROUSEL-->
+		<!-- ---------------------------------------------------------------- -->
+		<div class="carousel-item" id="header3">
+	      <!-- <div class="c-test" alt="Third slide">HEYA</div> -->
+	      <div class = "content-center" alt = "Third slide">
+	      	
+	      	<div class = "largepalette">
+		        <div class = "met-palcol" id ="met1"></div>
+		        <div class = "met-palcol" id ="met2"></div>
+		        <div class = "met-palcol" id ="met3"></div>
+		        <div class = "met-palcol" id ="met4"></div>
+		        <div class = "met-palcol" id ="met5"></div>
+		    </div>
+		   
+
+		    <div class="filters">
+	    		<div class = "filter-container"><button id='filter1' class="filter" style="color: white; background-color: #446DFC" onclick="showfiltered(1)">All</button></div>
+	    		<div class = "filter-container"><button id='filter2' class="filter" onclick="showfiltered(2)">Graphics</button></div>
+	    		<div class = "filter-container"><button id='filter3' class="filter" onclick="showfiltered(3)">Stone/Wood/Pottery</button></div>
+	    		<div class = "filter-container"><button id='filter4' class="filter" onclick="showfiltered(4)">Metal/Glass</button></div>
+	    		<div class = "filter-container"><button id='filter5' class="filter" onclick="showfiltered(5)">Textiles</button></div>
+		    </div>
+		    
+		    <div id="palIms1" class="image-grid"></div>
+		    <div id="palIms2" class="image-grid" style="display:none"></div>
+		    <div id="palIms3" class="image-grid" style="display:none"></div>
+		    <div id="palIms4" class="image-grid" style="display:none"></div>
+		    <div id="palIms5" class="image-grid" style="display:none"></div>
+
+	      </div>
+	    </div>
+
+
+	  </div>
+
+	  <a class="c-arrow" href="#carouselExampleIndicators" role="button" data-slide="prev" onclick="arrowstest(-1)">
+	    <img src="/static/prevarrow.png" class="c-arrow-prev" aria-hidden="true"></img>
+	    <span class="sr-only">Previous</span>
+	  </a>
+	  <a class="c-arrow" href="#carouselExampleIndicators" role="button" data-slide="next" onclick="arrowstest(1)">
+	    <img src="/static/nextarrow.png"  class="c-arrow-next"aria-hidden="true"></img>
+	    <span class="sr-only">Next</span>
+	  </a>
+
+	</div>
+
+
+  	<div class = "content-center"><br></br>
+	    <div><button class="new-upload-btn" onclick="uploadscreen()"> return to upload </button></div>
+	</div>
+</div>
+
+<script>
+	//---------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------
+	// PAL-IN-IMAGE BOX PICKER / COLOR PICKER CODE
+	//---------------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------
+	var boxPicker1 = new iro.ColorPicker("#boxPicker1", {
+	  width: 125,
+	  color: "rgb(197, 107, 42)",
+	  borderWidth: 0,
+	  borderColor: "#262626",
+	  layout: [
+	    {
+	      component: iro.ui.Box,
+	    },
+	    {
+	      component: iro.ui.Slider,
+	      options: {
+	        sliderType: 'hue'
+	      }
+	    }
+	  ]
+	});
+
+	var boxPicker2 = new iro.ColorPicker("#boxPicker2", {
+	  width: 125,
+	  color: "rgb(197, 107, 42)",
+	  borderWidth: 0,
+	  borderColor: "#262626",
+	  layout: [
+	    {
+	      component: iro.ui.Box,
+	    },
+	    {
+	      component: iro.ui.Slider,
+	      options: {
+	        sliderType: 'hue'
+	      }
+	    }
+	  ]
+	});
+
+	var boxPicker3 = new iro.ColorPicker("#boxPicker3", {
+	  width: 125,
+	  color: "rgb(197, 107, 42)",
+	  borderWidth: 0,
+	  borderColor: "#262626",
+	  layout: [
+	    {
+	      component: iro.ui.Box,
+	    },
+	    {
+	      component: iro.ui.Slider,
+	      options: {
+	        sliderType: 'hue'
+	      }
+	    }
+	  ]
+	});
+
+	var boxPicker4 = new iro.ColorPicker("#boxPicker4", {
+	  width: 125,
+	  color: "rgb(197, 107, 42)",
+	  borderWidth: 0,
+	  borderColor: "#262626",
+	  layout: [
+	    {
+	      component: iro.ui.Box,
+	    },
+	    {
+	      component: iro.ui.Slider,
+	      options: {
+	        sliderType: 'hue'
+	      }
+	    }
+	  ]
+	});
+
+	var boxPicker5 = new iro.ColorPicker("#boxPicker5", {
+	  width: 125,
+	  color: "rgb(197, 107, 42)",
+	  borderWidth: 0,
+	  borderColor: "#262626",
+	  layout: [
+	    {
+	      component: iro.ui.Box,
+	    },
+	    {
+	      component: iro.ui.Slider,
+	      options: {
+	        sliderType: 'hue'
+	      }
+	    }
+	  ]
+	});
+
+	var hexval1 = document.getElementById("hexval1");
+	var circle1 = document.getElementById("circle1");
+	hexval1.value = "#759665";
+	circle1.style.backgroundColor = hexval1.value;
+    boxPicker1.addColor(hexval1.value);
+	boxPicker1.removeColor(0);
+
+
+	var hexval2 = document.getElementById("hexval2");
+	var circle2 = document.getElementById("circle2");
+	hexval2.value = "#64655c";
+	circle2.style.backgroundColor = hexval2.value;
+    boxPicker2.addColor(hexval2.value);
+	boxPicker2.removeColor(0);
+
+	var hexval3 = document.getElementById("hexval3");
+	var circle3 = document.getElementById("circle3");
+	hexval3.value = "#e3e0d8";
+	circle3.style.backgroundColor = hexval3.value;
+    boxPicker3.addColor(hexval3.value);
+	boxPicker3.removeColor(0);
+
+	var hexval4 = document.getElementById("hexval4");
+	var circle4 = document.getElementById("circle4");
+	hexval4.value = "#a06549";
+	circle4.style.backgroundColor = hexval4.value;
+    boxPicker4.addColor(hexval4.value);
+	boxPicker4.removeColor(0);
+
+	var hexval5 = document.getElementById("hexval5");
+	var circle5 = document.getElementById("circle5");
+	hexval5.value = "#ada286";
+	circle5.style.backgroundColor = hexval5.value;
+    boxPicker5.addColor(hexval5.value);
+	boxPicker5.removeColor(0);
+
+
+	// Fills circle and adjust box/hue slider colors & position with hex input
+	hexval1.onchange = function() {
+		circle1.style.backgroundColor = this.value;
+		boxPicker1.addColor(this.value);
+		boxPicker1.removeColor(0);
+	}
+
+	boxPicker1.on(["color:change"], function(color){
+	  hexval1.value = color.hexString;
+	  circle1.style.backgroundColor = color.hexString;
+	});
+
+	boxPicker1.on(["input:end"], function(input) {
+		var rgb1 = circle1.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb2 = circle2.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb3 = circle3.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb4 = circle4.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb5 = circle5.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+
+		var pal = "[[" + rgb1 + "],[" + rgb2 + "],[" + rgb3 + "],[" + rgb4 + "],[" + rgb5 + "]]";
+
+		var img = '{{ img_obj.image.url}}';
+	 	get_palinim(img, pal);
+	});
+
+
+	hexval2.onchange = function() {
+		circle2.style.backgroundColor = this.value;
+		boxPicker2.addColor(this.value);
+		boxPicker2.removeColor(0);
+	}
+
+	boxPicker2.on(["color:change"], function(color){
+	  hexval2.value = color.hexString;
+	  circle2.style.backgroundColor = color.hexString;
+	});
+
+	boxPicker2.on(["input:end"], function(input) {
+		var rgb1 = circle1.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb2 = circle2.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb3 = circle3.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb4 = circle4.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb5 = circle5.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+
+		var pal = "[[" + rgb1 + "],[" + rgb2 + "],[" + rgb3 + "],[" + rgb4 + "],[" + rgb5 + "]]";
+
+		var img = '{{ img_obj.image.url}}';
+	 	get_palinim(img, pal);
+	});
+
+
+	hexval3.onchange = function() {
+		circle3.style.backgroundColor = this.value;
+		boxPicker3.addColor(this.value);
+		boxPicker3.removeColor(0);
+	}
+
+	boxPicker3.on(["color:change"], function(color){
+	  hexval3.value = color.hexString;
+	  circle3.style.backgroundColor = color.hexString;
+	});
+
+	boxPicker3.on(["input:end"], function(input) {
+		var rgb1 = circle1.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb2 = circle2.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb3 = circle3.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb4 = circle4.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb5 = circle5.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+
+		var pal = "[[" + rgb1 + "],[" + rgb2 + "],[" + rgb3 + "],[" + rgb4 + "],[" + rgb5 + "]]";
+
+
+		var img = '{{ img_obj.image.url}}';
+	 	get_palinim(img, pal);
+	});
+
+	hexval4.onchange = function() {
+		circle4.style.backgroundColor = this.value;
+		boxPicker4.addColor(this.value);
+		boxPicker4.removeColor(0);
+	}
+
+	boxPicker4.on(["color:change"], function(color){
+	  hexval4.value = color.hexString;
+	  circle4.style.backgroundColor = color.hexString;
+	});
+
+	boxPicker4.on(["input:end"], function(input) {
+		var rgb1 = circle1.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb2 = circle2.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb3 = circle3.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb4 = circle4.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb5 = circle5.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+
+		var pal = "[[" + rgb1 + "],[" + rgb2 + "],[" + rgb3 + "],[" + rgb4 + "],[" + rgb5 + "]]";
+
+
+		var img = '{{ img_obj.image.url}}';
+	 	get_palinim(img, pal);
+	});
+
+
+
+	hexval5.onchange = function() {
+		circle5.style.backgroundColor = this.value;
+		boxPicker5.addColor(this.value);
+		boxPicker5.removeColor(0);
+	}
+
+	boxPicker5.on(["color:change"], function(color){
+	  hexval5.value = color.hexString;
+	  circle5.style.backgroundColor = color.hexString;
+	});
+
+	boxPicker5.on(["input:end"], function(input) {
+		var rgb1 = circle1.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb2 = circle2.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb3 = circle3.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb4 = circle4.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+		var rgb5 = circle5.style.backgroundColor.replace(/^rgba?\(|\s+|\)$/g,'').split(',');
+
+		var pal = "[[" + rgb1 + "],[" + rgb2 + "],[" + rgb3 + "],[" + rgb4 + "],[" + rgb5 + "]]";
+
+
+		var img = '{{ img_obj.image.url}}';
+	 	get_palinim(img, pal);
+	});
+
+	var hueslider = document.getElementById("hueslider");
+	var hueval = document.getElementById("hueval");
+
+	hueslider.onchange = function(){
+		var val = hueslider.value;
+		hueval.value = val;
+
+		var img = '{{ img_obj.image.url}}';
+		get_hue(img, val);
+	}
+
+	hueval.onchange = function(){
+		var val = hueval.value;
+		if (val < 0){ val = 0 };
+		if (val > 360) { val = 360};
+		hueslider.value = val;
+
+		var img = '{{ img_obj.image.url}}';
+		get_hue(img, val);
+	}
+
+
+	var pixslider = document.getElementById("pixslider");
+	var pixval = document.getElementById("pixval");
+
+	pixslider.onchange = function(){
+		var val = pixslider.value;
+		pixval.value = val;
+
+		var img = '{{ img_obj.image.url}}';
+		get_pix(img, val);
+	}
+
+	pixval.onchange = function(){
+		var val = pixval.value;
+		if (val < 0){ val = 0 };
+		if (val > 360) { val = 360};
+		pixslider.value = val;
+
+		var img = '{{ img_obj.image.url}}';
+		get_pix(img, val);
+	}
+
+
+</script>
+<!-- 
+<div class = "subheader"> TEST // MET Image return from word</div>
+  Word Search: <input type="text" id="wordbox" value=""><br>
+  <input type="submit" onclick="getims()">
+
+  <div id="wordIms" class="image-grid"> </div>
+ -->
+
+<script>
+
+
+	// let test1urls = ['https://images.metmuseum.org/CRDImages/es/original/ES525.jpg', 'https://images.metmuseum.org/CRDImages/rl/original/DT3579.jpg', 'https://images.metmuseum.org/CRDImages/ci/original/83.1.111.jpg']
+
+	// let test1cols = [
+
+	// [[179.24063205417607, 182.0433408577878, 185.06772009029345], 
+	// [73.66753698868581, 63.10182767624021, 50.02523933855527], 
+	// [118.43419434194342, 102.50984009840099, 78.11008610086101], 
+	// [199.29616724738676, 201.45435540069687, 203.05714285714285], 
+	// [144.61935483870968, 140.5974193548387, 131.8232258064516]], 
+
+	// [[184.5497596153846, 185.2483173076923, 187.00576923076923], 
+	// [76.86013462976814, 61.00598354525056, 49.991024682124156],
+	// [123.51972157772622, 105.87587006960557, 87.25232018561485], 
+	// [213.8873552983081, 213.88290293855744, 214.01780943900266], 
+	// [152.31503579952266, 150.59154449369245, 149.98977156495056]], 
+
+	// [[190.647577092511, 190.34948604992658, 188.92437591776797], 
+	// [62.08007941760424, 56.93646591661152, 42.6631369953673], 
+	// [109.60809608540926, 95.46040925266904, 69.83185053380782], 
+	// [209.50940860215053, 210.08770161290323, 211.0356182795699], 
+	// [146.052583862194, 140.6019945602901, 130.1994560290118]]
+
+	// ]
+
+	// let test2urls = ['https://images.metmuseum.org/CRDImages/md/original/DP166787.jpg', 'https://images.metmuseum.org/CRDImages/is/original/DP240096.jpg', 'https://images.metmuseum.org/CRDImages/rl/original/SLP1942-1.jpg']
+
+	// let test2cols = [
+
+	// [[100, 120, 49], 
+	// [180, 20, 211],
+	// [180, 20, 211],
+	// [100, 120, 49],
+	// [100, 120, 49]],
+
+	// [[100, 120, 49], 
+	// [180, 20, 211],
+	// [180, 20, 211],
+	// [100, 120, 49],
+	// [100, 120, 49]],
+
+	// [[100, 120, 49], 
+	// [180, 20, 211],
+	// [180, 20, 211],
+	// [100, 120, 49],
+	// [100, 120, 49]]
+
+	// ]
+
+	
+
+</script>
+
+
+
+{% endblock %}

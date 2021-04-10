@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ColorDive</title>
+
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
+  <base href="./">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+
+  <!-- color picker -->
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
+  <!-- IN LIEU OF STYLES.CSS, ALL STYLES IN BASE.HTML-->
+  <style>
+    body {
+      background-color: white;
+      color: black;
+      /*padding: 30px;*/
+      overflow-y: scroll;
+      font-family: 'Roboto', sans-serif;
+
+    }
+
+    .center {
+      position: absolute;
+      top:0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 60%;
+      height: 60%;
+
+    }
+
+
+    .content-center {
+      text-align: center;
+      margin: auto;
+      width: 100%;
+
+    }
+
+    .title {
+      font-size: 64px; 
+      font-weight: 700;
+      padding: 20px;
+
+    }
+
+    .pagetitle {
+      font-size: 4vw; 
+      font-weight: 700;
+      padding: 20px;
+
+    }
+
+    .title-subtext {
+      font-size: 18px;
+      font-style: italic;
+      font-weight: 300;
+      width: 80%;
+      margin:auto;
+    }
+
+
+    .header {
+      font-size: 3vw; 
+      font-weight: 600;
+    }
+
+
+    .blurb {
+      padding-top: 18px;
+      font-size: 1.5vw;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+
+    .header2 {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .subheader {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .bodytext {
+      font-size: 14px;
+    }
+
+
+    .input {
+      margin: auto;
+      text-align: center;
+    }
+
+    .choosefile {
+      cursor:pointer;
+      font-size: 18px;
+      font-weight: 500;
+      background-color: #C4C4C4;
+      color: black;
+      border: none;
+      border-radius: 6px;
+      width: 165px;
+      height: 55px;
+      margin-bottom: 16px;
+      padding:12px;
+
+
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+
+    }
+
+    .choosefile:hover{
+      opacity: .75;
+      transition: opacity .1s ease;
+
+    }
+
+    .hide-choosefile {
+      position: fixed;
+      bottom:-100px;
+      left: -100px;
+      opacity: 10%;
+    }
+
+    .introbuttons {
+      width: 100vw;
+      height: 55px;
+      overflow: hidden;
+      white-space: nowrap
+    }
+
+    .filename {
+      position: absolute;
+      width: 120px;
+      margin-bottom: 8px;
+      margin-left: 12px;
+      margin-top: 16px;
+      text-align: left;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      font-weight: 300;
+
+      display: inline-block;
+
+      color: rgba(0,0,0,.6);;
+    }
+
+
+    .submit {
+      cursor: not-allowed;
+      font-size: 18px;
+      font-weight: 500;
+      background-color: #446DFC;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      width: 165px;
+      height: 55px;
+      opacity: 1;
+    }
+
+    .submit:hover {
+      opacity: .75;
+      transition: opacity .1s ease;
+    }
+
+    .main-im {
+      /*max-height: 60vh;*/
+      margin-left: 1.5vw;
+      max-width: 100%;
+    }
+
+    .palcol {
+      width: 15vw;
+      height: calc(15vw * (5/7));
+
+      border-radius: 1vw;
+      display: inline-block;
+      background-color: white;
+
+
+      margin-right: .5vw;
+      /*margin-bottom: 8px;*/
+      border-style: solid;
+      border-width: .25px;
+      border-color: rgba(0,0,0,.1);
+    }
+
+    .met-palcol {
+      width: 15vw;
+      height: calc(15vw * (2/7));
+
+      border-radius: 1vw;
+      display: inline-block;
+      background-color: white;
+
+
+      margin-right: .5vw;
+      /*margin-bottom: 8px;*/
+      border-style: solid;
+      border-width: .25px;
+      border-color: rgba(0,0,0,.1);
+    }
+
+    .largepalette {
+      margin: .75vw;
+      opacity: 1;
+    }
+
+    .largepalette:hover {
+      opacity: .75;
+      cursor: pointer;
+      transition: opacity .1s ease;
+
+    }
+
+    .expanded {
+      display:flex;
+      background-color: #EFEFEF;
+      width: auto;
+      height: auto;
+      padding: 24px; 
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+
+    .image-grid {
+      display: flex;
+      flex-wrap:wrap;
+      margin-left: .74vw;
+      margin-right: .74vw;
+      padding-left: 9vw;
+      padding-right: 9vw;
+
+    }
+
+    .myrow {
+      padding-left: 8vw;
+      padding-right: 8vw;
+      padding-bottom: 12px;
+      display: flex;
+    }
+
+    .mycolumn {
+      flex: 50%;
+    }
+
+    .im-and-pal {
+      display:block;
+      padding:10px;
+      overflow-x: scroll;
+      white-space: nowrap;
+    }
+
+    .display-im {
+      top:0;
+      height: 200px;
+      width:auto;
+      max-width:70vw;
+      padding:10px; 
+      display: inline-block;
+    }
+
+    .palette {
+      float:left;
+      width: 25px;
+      height: 180px;
+      padding:10px;
+      padding-right:25px;
+      display: inline-block;
+    }
+
+    .pal-color {
+      width: 25px;
+      height: 25px;
+      border-radius: 25%;
+      margin-bottom: 8px;
+    }
+
+    .loader {
+      margin: auto;
+      border: 15px solid rgba(0,0,0,.2); /* Light grey */
+      border-top: 15px solid #446DFC; /* Blue */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .new-upload-btn {
+      background-color: #292929; /* Grey */
+      border: none;
+      border-radius: 8px;
+      color: white;
+      padding: 8px 18px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 12px;
+    }
+
+
+    .c-test {
+      background-color: #292929;
+      height: 100vh;
+      width: 100vw;
+      color: white;
+      font-size: 300px;
+
+    }
+
+    .c-arrow{
+      opacity: .5;
+      transition: opacity .2s ease;
+
+    }
+    .c-arrow:hover{
+      opacity: 1;
+
+    }
+
+    .c-arrow-prev {
+      color: white;
+      position: fixed;
+      background-color: #446DFC;
+      width: 36px;
+      height: 64px;
+      border-radius:6px;
+      top: 40vh;
+      padding: 0px;
+      left: 1vw;
+
+    }
+    .c-arrow-next {
+      color: white;
+      position: fixed;
+      background-color: #446DFC;
+      width: 36px;
+      height: 64px;
+      border-radius:6px;
+      top: 40vh;
+      padding: 0px;
+      right: 1vw;
+
+    }
+
+    .row {
+      display: flex;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-bottom: 50px;
+    }
+
+    .column {
+      flex: 50%;
+    }
+
+    .carousel-indicators {
+      position: relative;
+      margin:0;
+      margin-bottom: 20px;
+      width: 100%;
+      justify-content: left
+    }
+
+
+    .carousel-indicators li{
+      background-color: rgba(0,0,0,.2);
+      width:33%;
+      margin-right: 5px;
+      margin-left: 0px;
+      height:7px;
+      border-radius: 12px;
+      border-top: 0px;
+      border-bottom: 0px; 
+      opacity: 1;
+
+      transition: background-color .5s ease;
+    }
+
+    .carousel-indicators li.active{
+      background-color:#446DFC;
+    }
+
+    .exp-pal {
+      text-align:left;
+
+    }
+
+    .exp-palcol {
+      width: 5vw;
+      height: 5vw;
+      margin-left: .6vw;
+      margin-right: 6%;
+
+      border-radius: 8vw;
+      display: inline-block;
+      background-color: white;
+
+      border-style: solid;
+      border-width: .25px;
+      border-color: rgba(0,0,0,.1);
+
+    }
+
+    .exp-palcol-text {
+      width:7.4vw;
+      margin-left: 1vw;
+      font-size: 1.3vw;
+      display: inline-block;
+      font-style: italic;
+      font-weight: 300;
+
+    }
+
+    .exp-header {
+      font-size: 3vw;
+      font-weight: 600;
+
+    }
+
+    .exp-subtext {
+      font-size: 1.5vw;
+      font-style: italic;
+      font-weight: 300;
+      padding-bottom: 24px;
+      padding-top: 12px;
+
+    }
+
+    .cancel{
+      width:1.5vw
+    }
+
+    .cancel:hover {
+      cursor: pointer;
+    }
+
+    .manip-im {
+      padding: 1vw;
+      padding-bottom: .5vw;
+      padding-top: .5vw;
+      width: 100%;
+    }
+
+    .imrow {
+      margin-left: .74vw;
+      margin-right: .74vw;
+      opacity: 1;
+    }
+
+    .imrow:hover {
+      cursor: pointer;
+    }
+
+    .pal-input-container{
+      margin-left: .6vw; 
+      margin-right: 7.5%;
+
+    }
+
+
+    .pal-input{
+      width: 5vw;
+      height: 5vw;
+
+      border-radius: 8vw;
+      display: inline-block;
+      background-color: white;
+
+      box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+      border-width: 0;
+    }
+
+    .pal-input:hover {
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(120, 120, 120, 1);
+      border-width: 0;
+
+    }
+
+    .inputbox {
+      width:7.3vw;
+      margin-left: 1vw;
+      margin-right: .4vw;
+      font-size: 1.3vw;
+      font-style: italic;
+      font-weight: 300;
+
+      opacity: .75;
+      height: 3vw;
+      background-color: #d9d9d9;
+      border-radius: 0.75vw;
+      color: black;
+      text-align: center;
+      padding: 2px;
+      border-width: 0;
+    }
+
+    .inputbox:hover {
+      opacity: 1;
+
+    }
+
+    .slidecontainer {
+      width: 100%; /* Width of the outside container */
+      display:flex;
+    }
+
+    /* The slider itself */
+    .slider {
+      -webkit-appearance: none;  /* Override default CSS styles */
+      appearance: none;
+      width: 100%; /* Full-width */
+      height: 2vw; /* Specified height */
+      background: #d3d3d3; /* Grey background */
+      outline: none; /* Remove outline */
+      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+      -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+      transition: opacity .2s;
+      border-radius: 10vw;
+    }
+
+    /* Mouse-over effects */
+    .slider:hover {
+      opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      width: 3vw; /* Set a specific slider handle width */
+      height: 3vw; /* Slider handle height */
+      background: #446DFC; /* Green background */
+      cursor: pointer; /* Cursor on hover */
+      border-radius: 8vw;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px; /* Set a specific slider handle width */
+      height: 25px; /* Slider handle height */
+      background: #446DFC; /* Green background */
+      cursor: pointer; /* Cursor on hover */
+    }
+
+    .filters {
+      justify-content: center;
+      width:100vw;
+      display:flex;
+      flex-wrap: wrap;
+      padding-left:8vw;
+      padding-right:8vw;
+    }
+
+
+    .filter-container {
+      padding-right:8px;
+      padding-bottom: 8px;
+      display:inline-block;
+    }
+
+    .filter {
+      padding:12px;
+      font-size: 85%;
+      font-weight: 500;
+      background-color: #d9d9d9;
+      color: black;
+      border: none;
+      text-overflow: wrap;
+      border-radius: 6px;
+      width: 15vw;
+      min-width: 160px;
+      height: 48px;
+      opacity: 1;
+    }
+
+    .filter:hover {
+      cursor: pointer;
+      opacity: .75;
+    }
+
+
+
+</style>
+
+
+</head>
+<body>
+{% load static %}
+
+
+<div style="background-color: white; padding-top: 20px;"></div>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

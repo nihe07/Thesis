@@ -1,0 +1,12 @@
+django
+gunicorn
+django-heroku
+django-storages
+numpy
+scipy
+Pillow
+requests
+boto3
+opencv-python-headless==4.2.0.32
+google-cloud-vision==2.0.0
+Google-images-search
