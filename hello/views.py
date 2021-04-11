@@ -48,6 +48,22 @@ imurls = []
 imcols = []
 METdone = False
 
+c1_imurls = []
+c1_imcols = []
+c2_imurls = []
+c2_imcols = []
+c3_imurls = []
+c3_imcols = []
+c4_imurls = []
+c4_imcols = []
+
+immet = []
+c1_met = []
+c2_met = []
+c3_met = []
+c4_met = []
+c5_met = []
+
 
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
@@ -153,6 +169,13 @@ def returnMET(request):
   global c4_imurls
   global c4_imcols
 
+  global immet
+  global c1_met
+  global c2_met
+  global c3_met
+  global c4_met
+  global c5_met
+
   if (METdone == True): METdone = False
   if request.method == 'GET': 
     imurls = []
@@ -165,6 +188,12 @@ def returnMET(request):
     c3_imcols = []
     c4_imurls = []
     c4_imcols = []
+
+    immet = []
+    c1_met = []
+    c2_met = []
+    c3_met = []
+    c4_met = []
 
     data = []
     imsrc = request.GET['imsrc']
@@ -194,8 +223,15 @@ def returnMETvals(request):
   global c4_imurls
   global c4_imcols
 
+  global immet
+  global c1_met
+  global c2_met
+  global c3_met
+  global c4_met
+  global c5_met
+
   if request.method == 'GET':  
-    data = [None] * 15
+    data = [None] * 17
 
     data[0] = METdone
     data[1] = imurls
@@ -208,6 +244,12 @@ def returnMETvals(request):
     data[8] = c3_imcols
     data[9] = c4_imurls
     data[10] = c4_imcols
+
+    data[11] = immet
+    data[12] = c1_met
+    data[13] = c2_met
+    data[14] = c3_met
+    data[15] = c4_met
 
     if (METdone == True): METdone == False
 
@@ -881,6 +923,7 @@ def find_palette(image, num_clust):
   	else:
   		for j in range(n,5):
   			colors[j] = colors[0]
+  			
   return colors 
 
 
@@ -1231,13 +1274,18 @@ def color_search(search_pal):
     global c3_imcols
     global c4_imurls
     global c4_imcols
-
+    global immet
+    global c1_met
+    global c2_met
+    global c3_met
+    global c4_met
+    global c5_met
 
     print("COLOR SEARCH WAS CALLED")
 
     conn = sqlite3.connect('METdatabase.db')
     c = conn.cursor()
-    query = "SELECT ImageURL, Colors, Class FROM database "
+    query = "SELECT ImageURL, Colors, Class, Link FROM database "
     c.execute(query)
     metobjs = c.fetchall()
 
@@ -1247,6 +1295,8 @@ def color_search(search_pal):
     METimurls = heynp[:,0]
     colors = heynp[:,1]
     METclass = heynp[:,2]  
+    METlinks = heynp[:,3] 
+
     METcolors = np.array([conv(xi) for xi in colors])  
     # toc = time.time() # TIMER 1 END
     # print('convert to float: ', (toc-tic))
@@ -1269,42 +1319,43 @@ def color_search(search_pal):
     imurls = METimurls[args]
     imcols = sort_pals[args]
     classes = METclass[args]
+    links = METlinks[args]
 
-    # imurls = imurls[0:10]
-    # imcols = imcols[0:10]
-    # classes = classes[0:10]
-
-    # RETURN ALL
     # CLASS1 PAINTINGS/DRAWINGS
     c1_ind = np.where(classes == "C1")
     c1_imurls = imurls[c1_ind][0:30]
     c1_imcols = imcols[c1_ind][0:30]
+    c1_met = links[c1_ind][0:30]
 
 
     # CLASS2 TEXTILES/CLOTHING
     c2_ind = np.where(classes == "C2")
     c2_imurls = imurls[c2_ind][0:30]
     c2_imcols = imcols[c2_ind][0:30]
+    c2_met = links[c2_ind][0:30]
 
 
     # CLASS3 METAL/GLASS
     c3_ind = np.where(classes == "C3")
     c3_imurls = imurls[c3_ind][0:30]
     c3_imcols = imcols[c3_ind][0:30]
+    c3_met = links[c3_ind][0:30]
 
 
     # CLASS4 STONE/SCULPTURE/WOOD
     c4_ind = np.where(classes == "C4")
     c4_imurls = imurls[c4_ind][0:30]
     c4_imcols = imcols[c4_ind][0:30]
+    c4_met = links[c4_ind][0:30]
 
-
+    # Return All
     imurls = imurls[0:30]
     imcols = imcols[0:30]
-
+    immet = links[0:30]
 
     imurls = imurls.tolist()
     imcols = imcols.tolist()
+    immet = immet.tolist()
 
     c1_imurls = c1_imurls.tolist()
     c2_imurls = c2_imurls.tolist()
@@ -1316,10 +1367,16 @@ def color_search(search_pal):
     c3_imcols = c3_imcols.tolist()
     c4_imcols = c4_imcols.tolist()
 
+
+    c1_met = c1_met.tolist()
+    c2_met = c2_met.tolist()
+    c3_met = c3_met.tolist()
+    c4_met = c4_met.tolist()
+
     conn.close()
     METdone = True
 
-    return imurls, imcols, c1_imurls, c2_imurls, c3_imurls, c4_imurls, c1_imcols, c2_imcols, c3_imcols, c4_imcols
+    return imurls, imcols, c1_imurls, c2_imurls, c3_imurls, c4_imurls, c1_imcols, c2_imcols, c3_imcols, c4_imcols, immet, c1_met, c2_met, c3_met, c4_met
     # return imurls, imcols
 
 ## ORIGINAL CODE
@@ -1459,13 +1516,6 @@ def find_labels(im):
   client = vision.ImageAnnotatorClient()
   # [END vision_python_migration_client]
 
-  # The name of the image file to annotate
-  # file_name = os.path.abspath(loc)
-
-  # Loads the image into memory
-  # with io.open(file_name, 'rb') as image_file:
-  #   content = image_file.read()
-
   buffer = io.BytesIO()
   im.save(buffer, "JPEG")
   content = buffer.getvalue()
@@ -1525,6 +1575,3 @@ def google_im_search_palette(queries):
             pass
 
   return domcols
-
-
-
