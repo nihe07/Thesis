@@ -123,6 +123,12 @@
             var c4_imurls = response[9];
             var c4_imcols = response[10];
 
+            var immet = response[11];
+            var c1_met = response[12];
+            var c2_met = response[13];
+            var c3_met = response[14];
+            var c4_met = response[15];
+
 
             if(METdone == false) {
                 console.log('heyyyy gurrllll');
@@ -133,11 +139,13 @@
                 console.log('BYE BISH');
 				let urlsarr = [imurls, c1_imurls, c2_imurls, c3_imurls, c4_imurls];
 				let colsarr = [imcols, c1_imcols, c2_imcols, c3_imcols, c4_imcols];
+                let metarr = [immet, c1_met, c2_met, c3_met, c4_met];
 
 				// for each category
-				for (let k = 0; k < 7; k++){
+				for (let k = 0; k < 5; k++){
 					let urls = urlsarr[k];
 					let imcols = colsarr[k];
+                    let meturls = metarr[k]
 					let id = k+1
 
 					let containerstr = "palIms" + id;
@@ -153,16 +161,17 @@
 				        img.src = urls[i];
 				        img.className= "display-im";
 
-				        // let objectURL = "http://www.metmuseum.org/art/collection/search/38";
+				        let objectURL = meturls[i];
 				        
-				        // var link = document.createElement('a');
-				        // link.setAttribute("href", objectURL);
-	           //          link.setAttribute("target", "_blank");
-	           //          link.appendChild(img)
+				        var link = document.createElement('a');
+				        link.setAttribute("href", objectURL);
+	                    link.setAttribute("target", "_blank");
+	                    link.appendChild(img)
 
 
 				        var elem = document.createElement('div');
 				        elem.setAttribute("class", "im-and-pal");
+
 				        var pal = document.createElement('div');
 				        pal.setAttribute("class", "palette");
 
@@ -173,46 +182,13 @@
 				            col.style.cssText = 'background-color:' + hex + ';'
 				            pal.appendChild(col)
 				        }
-				        elem.append(img);
-				        // elem.append(link);
-				        elem.append(pal);
+
+                        elem.append(pal);
+				        // elem.append(img);
+				        elem.append(link);
 				        container.appendChild(elem)
 				    }
 				}
-
-
-
-
-
-
-
-                document.getElementById('palIms').innerHTML= ""
-                var container = document.getElementById('palIms');
-
-                for (let i = 0; i < 10; i++) {
-                    var img = document.createElement('img');
-                    img.src = imurls[i];
-                    img.className= "display-im"
-
-                    cols = imcols[i]
-                    var elem = document.createElement('div');
-                    elem.setAttribute("class", "im-and-pal");
-
-                    var pal = document.createElement('div');
-                    pal.setAttribute("class", "palette");
-
-                    for (let j = 0; j <5; j++) {
-                        let col = document.createElement('div');
-                        col.setAttribute("class", "pal-color");
-                        let hex = 'rgb(' + cols[j][0]+ ',' + cols[j][1] + ',' + cols[j][2] + ')';
-                        col.style.cssText = 'background-color:' + hex + ';'
-                        pal.appendChild(col)
-                    }
-                    
-                    elem.append(img);
-                    elem.append(pal);
-                    container.appendChild(elem)
-                }
             } 
         });    
     }
